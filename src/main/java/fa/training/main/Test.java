@@ -10,7 +10,7 @@ import java.util.Scanner;
 public class Test {
 
     private static final Scanner scanner = new Scanner(System.in);
-    private static final CustomerService customerService = new CustomerService();
+    private static final CustomerService customerService = new CustomerService(scanner);
 
     public static void showMenu(){
         String menu = """

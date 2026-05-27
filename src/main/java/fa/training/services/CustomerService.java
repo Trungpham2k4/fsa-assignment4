@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
 public class CustomerService {
     private final List<Customer> customers;
     private final Scanner scanner;
-    public CustomerService() {
+    public CustomerService(Scanner scanner) {
         customers = new ArrayList<>();
-        scanner = new Scanner(System.in);
+        this.scanner = scanner;
     }
     public List<String> createCustomer(){
         String name = getStringInput("Enter name: ");
@@ -66,22 +66,21 @@ public class CustomerService {
     }
 
     public List<String> findAll(){
-        return customers.stream().map(Customer::toString).collect(Collectors.toList());
+        return customers.stream()
+                .map(customer -> customer.getName() + "|" + customer.getPhone() + "|" + customer.getAddress() +
+                        "|" + customer.getOrders().toString())
+                .collect(Collectors.toList());
     }
     public void display(List<String> customers){
         System.out.printf("%-25s%-25s%-25s%-25s", "Customer Name", "Address", "Phone Number", "OrderList");
         System.out.println();
         for(String customer : customers){
-            String attributes = customer.substring(9, customer.length() - 1);
-            int orderIdx = attributes.indexOf("orders");
-            String order = attributes.substring(orderIdx + 13, attributes.length() - 1);
-            String otherAttr = attributes.substring(0, orderIdx - 2);
-            String[] attrs = otherAttr.split(",");
+            String[] attrs = customer.trim().split("\\|");
             System.out.printf("%-25s%-25s%-25s%-25s",
-                    attrs[0].split("=")[1].replaceAll("'", ""),
-                    attrs[1].split("=")[1].replaceAll("'", ""),
-                    attrs[2].split("=")[1].replaceAll("'", ""),
-                    order);
+                    attrs[0],
+                    attrs[1],
+                    attrs[2],
+                    attrs[3]);
             System.out.println();
         }
     }
