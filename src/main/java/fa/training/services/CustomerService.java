@@ -78,8 +78,8 @@ public class CustomerService {
             String[] attrs = customer.trim().split("\\|");
             System.out.printf("%-25s%-25s%-25s%-25s",
                     attrs[0],
-                    attrs[1],
                     attrs[2],
+                    attrs[1],
                     attrs[3]);
             System.out.println();
         }
