@@ -65,10 +65,11 @@ public class Test {
             System.out.println(order);
         }
     }
-    private static void removeCustomer(){
+    private static void removeCustomer() throws IOException {
         String phoneNumber = customerService.inputValidPhoneNumber("Enter phone number: ");
         if(customerService.remove(phoneNumber)){
             System.out.println("Customer removed");
+            saveData();
         }else{
             System.out.println("Can't remove customer with phone number: " + phoneNumber);
         }
