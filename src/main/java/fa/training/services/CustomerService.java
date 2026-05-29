@@ -6,6 +6,9 @@ import fa.training.utils.Constants;
 import fa.training.utils.Validator;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.ResolverStyle;
@@ -65,12 +68,67 @@ public class CustomerService {
         return "Save data successful";
     }
 
+    public boolean load(){
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter
+                .ofPattern("dd/MM/uuuu")
+                .withResolverStyle(ResolverStyle.STRICT);
+        Path path = Paths.get(Constants.OUTPUT_FILE);
+        if(!Files.exists(path)){
+            return false;
+        }else{
+            try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(Constants.OUTPUT_FILE))){
+                while(true){
+                    String customerStr = (String) ois.readObject();
+                    String[] parts = customerStr.split("\\|");
+                    if(parts.length == 4){
+                        String name = parts[0];
+                        String phone = parts[1];
+                        String address = parts[2];
+                        List<Order> orders = new ArrayList<>();
+                        String ordersStr = parts[3].substring(1, parts[3].length() - 1);
+                        if(!ordersStr.isBlank()){
+                            String[] specificOrder = ordersStr.split("&");
+                            for(String o : specificOrder){
+                                String[] orderAttrs = o.substring(1,o.length()-1).split(", ");
+                                if(orderAttrs.length == 2){
+                                    String orderNumber = orderAttrs[0];
+                                    LocalDate orderDate = LocalDate.parse(orderAttrs[1], dateTimeFormatter);
+                                    orders.add(new Order(orderNumber, orderDate));
+                                }
+                            }
+                        }
+                        customers.add(new Customer(name, phone, address, orders));
+                    }
+                }
+            }catch (EOFException e){
+                return true;
+            }catch (IOException | ClassNotFoundException e){
+                System.out.println("Error while loading data: " + e.getMessage());
+                return false;
+            }
+        }
+    }
+
     public List<String> findAll(){
         return customers.stream()
                 .map(customer -> customer.getName() + "|" + customer.getPhone() + "|" + customer.getAddress() +
-                        "|" + customer.getOrders().toString())
+                        "|" + convertListOfOrdersToString(customer.getOrders()))
                 .collect(Collectors.toList());
     }
+
+    private String convertListOfOrdersToString(List<Order> orders){
+        StringBuilder builder = new StringBuilder();
+        builder.append("[");
+        for(Order order : orders){
+            builder.append(order.toString()).append("&");
+        }
+        if(builder.length() > 1){
+            builder.deleteCharAt(builder.length() - 1);
+        }
+        builder.append("]");
+        return builder.toString();
+    }
+
     public void display(List<String> customers){
         System.out.printf("%-25s%-25s%-25s%-25s", "Customer Name", "Address", "Phone Number", "OrderList");
         System.out.println();

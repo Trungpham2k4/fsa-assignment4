@@ -25,6 +25,11 @@ public class Test {
     }
 
     public static void main(String[] args) throws IOException {
+        if(customerService.load()){
+            System.out.println("Loaded customer successfully");
+        }else{
+            System.out.println("No customer loaded");
+        }
         start();
     }
 

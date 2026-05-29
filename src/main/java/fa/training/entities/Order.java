@@ -1,6 +1,7 @@
 package fa.training.entities;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class Order {
     private String number;
@@ -31,9 +32,9 @@ public class Order {
 
     @Override
     public String toString() {
-        return "{" +
-                "number='" + number + '\'' +
-                ", date=" + date +
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        return "{" + number +
+                ", " + date.format(formatter) +
                 '}';
     }
 }
